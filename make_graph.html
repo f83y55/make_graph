@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <main>
+    </main>
+    <script src="make_graph.js"></script>
+    <script>
+        var graph1 = {
+            "directed": true,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "A",
+                    "x": 0.5
+                },
+                {
+                    "id": "B"
+                },
+                {
+                    "id": "C",
+                    "color": "blue"
+                },
+                {
+                    "id": "D"
+                },
+                {
+                    "id": "E"
+                },
+                {
+                    "id": "F"
+                }
+            ],
+            "links": [
+                {
+                    "weight": 18,
+                    "source": "A",
+                    "target": "C",
+                    "color": "orange"
+                },
+                {
+                    "weight": 3,
+                    "source": "A",
+                    "target": "D"
+                },
+                {
+                    "weight": 5,
+                    "source": "A",
+                    "target": "E"
+                },
+                {
+                    "weight": 26777,
+                    "source": "A",
+                    "target": "B"
+                },
+                {
+                    "weight": 12,
+                    "source": "B",
+                    "target": "C"
+                },
+                {
+                    "weight": 6,
+                    "source": "B",
+                    "target": "E"
+                },
+                {
+                    "weight": 8,
+                    "source": "B",
+                    "target": "F"
+                },
+                {
+                    "weight": 5,
+                    "source": "C",
+                    "target": "E"
+                },
+                {
+                    "weight": 16,
+                    "source": "C",
+                    "target": "F"
+                },
+                {
+                    "weight": 17,
+                    "source": "C",
+                    "target": "D"
+                },
+                {
+                    "weight": null,
+                    "source": "D",
+                    "target": "F"
+                },
+                {
+                    "weight": 1,
+                    "source": "D",
+                    "target": "E"
+                }
+            ]
+        };
+
+        var graph2 = {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "A",
+                    "y": 0.8
+                },
+                {
+                    "id": "B"
+                },
+                {
+                    "id": "Z"
+                }
+            ],
+            "links": [
+                {
+                    "weight": "",
+                    "weight_source": "100",
+                    "source": "A",
+                    "target": "B"
+                },
+                {
+                    "weight": "33",
+                    "source": "A",
+                    "target": "A"
+                },
+                {
+                    "weight": "56",
+                    "source": "A",
+                    "target": "C"
+                },
+                {
+                    "weight": 1,
+                    "source": "A",
+                    "target": "Z"
+                }
+            ]
+        };
+
+
+        var graphs = [graph1, graph2];
+        make_graph(graphs, "main", true);
+    </script>
+
+</body>
+
+</html>
