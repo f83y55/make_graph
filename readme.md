@@ -1,6 +1,6 @@
 
-<script src="make_graph.js"></script>
-<script>
+&lt;script src="make_graph.js"&gt;&lt;/script&gt;
+&lt;script&gt;
     var graph = {
         "directed": true,
         "nodes": [
@@ -45,5 +45,5 @@
 
     var graphs = [graph];
     make_graph(graphs, "main", true);
-</script>
+&lt;/script&gt;
 
