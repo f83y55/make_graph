@@ -1,11 +1,12 @@
 function make_graph(graphs, container = "body", edit_mode = false) {
     const SELECT = container;
-    const main = document.querySelector(SELECT);
-    const main_rect = main.getBoundingClientRect();
+    const container_element = document.querySelector(SELECT);
+    const main = document.createElement("div");
+    const container_rect = container_element.getBoundingClientRect();
     const nodes_width_min = 400;
     const nodes_height_min = 400;
-    const nodes_width = Math.max(main_rect["width"], nodes_width_min);
-    const nodes_height = Math.max(main_rect["height"], nodes_height_min);
+    const nodes_width = Math.max(container_rect["width"], nodes_width_min);
+    const nodes_height = Math.max(container_rect["height"], nodes_height_min);
     const FILENAME = "graphs"
     const BCOLOR = main.style["background-color"] ? main.style["background-color"] : "white";
     const COLOR = main.style["color"] ? main.style["color"] : "black";
@@ -13,16 +14,21 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     const map_nodes = new Map();
     const id_nodes = new Object();
     const nodes = document.createElement("div");
-    nodes.style["position"] = "absolute";
-    nodes.style["left"] = "0px";
-    nodes.style["top"] = "0px";
-    nodes.style["width"] = `${nodes_width}px`;
-    nodes.style["height"] = `${nodes_height}px`;
-    main.appendChild(nodes);
     const links = document.createElement("div");
-    main.appendChild(links);
     const labels = document.createElement("div");
-    main.appendChild(labels);
+    for (let element of [main, nodes, links, labels]) {
+        element.style["padding"] = 0;
+        element.style["margin"] = 0;
+        element.style["position"] = "absolute";
+        element.style["left"] = "0px";
+        element.style["top"] = "0px";
+        element.style["width"] = `${nodes_width}px`;
+        element.style["height"] = `${nodes_height}px`;
+    }
+    container_element.appendChild(main);
+    for (let element of [nodes, links, labels]) {
+        main.appendChild(element);
+    }
     if (edit_mode) {
         const button_download = document.createElement("button");
         button_download.textContent = "Download";
@@ -141,7 +147,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     function create_node(text) {
         let node = document.createElement("div");
         node.appendChild(document.createTextNode(text));
-        node.style.cssText = `position:absolute; padding:0.3em; z-index:1; border:1px solid ${COLOR}; border-radius:0.3em; background-color: ${BCOLOR}`
+        node.style.cssText = `user-select:none; position:absolute; margin:0; padding:0.3em; z-index:1; border:1px solid ${COLOR}; border-radius:0.3em; background-color: ${BCOLOR}`
         dragElement(node);
         nodes.appendChild(node);
         return node;
@@ -184,7 +190,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
 
     function create_link(directed = true, marker = "►") {
         let link_element = document.createElement("div");
-        link_element.style.cssText = `display:flex; margin:0; padding:0; z-index:-1; position:absolute; height:0; justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${BCOLOR}; border: solid 1px ${COLOR}; font-size:1.5em;`
+        link_element.style.cssText = `user-select:none; display:flex; margin:0; padding:0; z-index:-1; position:absolute; height:0; justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${BCOLOR}; border: solid 1px ${COLOR}; font-size:1.5em;`
         if (directed) { link_element.appendChild(document.createTextNode(marker)); }
         links.appendChild(link_element);
         return link_element;
@@ -192,14 +198,14 @@ function make_graph(graphs, container = "body", edit_mode = false) {
 
     function create_loop() {
         let loop_element = document.createElement("div");
-        loop_element.style.cssText = `display:flex; margin:0; padding:0; z-index:-1; position:absolute; align-items:center; background-color:transparent; border-top: solid 1px ${COLOR};  border-right: solid 1px ${COLOR}; border-radius: 1em;`
+        loop_element.style.cssText = `user-select:none; display:flex; margin:0; padding:0; z-index:-1; position:absolute; align-items:center; background-color:transparent; border-top: solid 1px ${COLOR};  border-right: solid 1px ${COLOR}; border-radius: 1em;`
         links.appendChild(loop_element);
         return loop_element;
     }
 
     function create_label() {
         let label = document.createElement("div");
-        label.style.cssText = `position:absolute; user-select:none; color:${COLOR}; font-size:smaller; border-radius:0.4em; background-color:${BCOLOR};`;
+        label.style.cssText = `position:absolute; user-select:none; color:${COLOR}; font-size:smaller; margin:0; padding:0; border-radius:0.4em; background-color:${BCOLOR};`;
         labels.appendChild(label);
         return label;
     }
@@ -254,7 +260,6 @@ function make_graph(graphs, container = "body", edit_mode = false) {
                             "link": link_element, "labels": label_object,
                         });
                         map_links.set(link_element, { "colors": [], "colors_graphs": [] });
-                        position(source_element, target_element, link_element, label_object);
                     }
                     for (k in LABELS) {
                         if (link[LABELS[k]]) {
@@ -264,7 +269,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
                             label_object[k].appendChild(content);
                         }
                     }
-
+                    position(source_element, target_element, link_element, label_object);
                 }
                 if (graph["color"]) {
                     map_links.get(link_element)["colors_graphs"].push(graph["color"]);
