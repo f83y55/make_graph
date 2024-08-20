@@ -11,24 +11,17 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     const BCOLOR = main.style["background-color"] ? main.style["background-color"] : "white";
     const COLOR = main.style["color"] ? main.style["color"] : "black";
     const LABELS = { 0.5: "weight", 0.2: "weight_source", 0.8: "weight_target" };
-    const map_nodes = new Map();
-    const id_nodes = new Object();
-    const nodes = document.createElement("div");
-    const links = document.createElement("div");
-    const labels = document.createElement("div");
-    for (let element of [main, nodes, links, labels]) {
-        element.style["padding"] = 0;
-        element.style["margin"] = 0;
-        element.style["position"] = "absolute";
-        element.style["left"] = "0px";
-        element.style["top"] = "0px";
-        element.style["width"] = `${nodes_width}px`;
-        element.style["height"] = `${nodes_height}px`;
-    }
+    main.style["position"] = "relative";
+    const display_element = document.createElement("div");
+    display_element.style["padding"] = 0;
+    display_element.style["margin"] = 0;
+    display_element.style["position"] = "absolute";
+    display_element.style["left"] = "0px";
+    display_element.style["top"] = "0px";
+    display_element.style["width"] = `${nodes_width}px`;
+    display_element.style["height"] = `${nodes_height}px`;
+    main.appendChild(display_element);
     container_element.appendChild(main);
-    for (let element of [nodes, links, labels]) {
-        main.appendChild(element);
-    }
     if (edit_mode) {
         const button_download = document.createElement("button");
         button_download.textContent = "Download";
@@ -38,6 +31,9 @@ function make_graph(graphs, container = "body", edit_mode = false) {
         button_download.onpointerdown = dl_graphs;
         main.appendChild(button_download);
     }
+    const map_nodes = new Map();
+    const id_nodes = new Object();
+
 
 
 
@@ -62,21 +58,22 @@ function make_graph(graphs, container = "body", edit_mode = false) {
 
     function position_loop(el, el_link, el_label = null) {
         let rect = el.getBoundingClientRect();
+        let display_rect = display_element.getBoundingClientRect();
         el_link.style["width"] = `${rect.right - rect.left}px`;
         el_link.style["height"] = `${rect.bottom - rect.top}px`;
-        el_link.style["left"] = `${(rect.left + rect.right) / 2 + window.scrollX}px`;
-        el_link.style["top"] = `${(3 * rect.top - rect.bottom) / 2 + window.scrollY}px`;
+        el_link.style["left"] = `${(rect.left + rect.right) / 2 - display_rect.left}px`;
+        el_link.style["top"] = `${(3 * rect.top - rect.bottom) / 2 - display_rect.top}px`;
         if (el_label) {
             let rectlabel = el_label.getBoundingClientRect();
-            el_label.style["left"] = `${(3 * rect.right - rect.left) / 2 + window.scrollX - rectlabel["width"] / 2}px`;
-            el_label.style["top"] = `${(3 * rect.top - rect.bottom) / 2 + window.scrollY - rectlabel["height"] / 2}px`;
+            el_label.style["left"] = `${(3 * rect.right - rect.left) / 2 - display_rect.left - rectlabel["width"] / 2}px`;
+            el_label.style["top"] = `${(3 * rect.top - rect.bottom) / 2 - display_rect.top - rectlabel["height"] / 2}px`;
         }
     }
 
     function position(el1, el2, el_link, label_object) {
         let rect1 = el1.getBoundingClientRect();
         let rect2 = el2.getBoundingClientRect();
-        let thickness = el_link.style["height"] ? parseFloat(el_link.style["height"]) : 0;
+        let display_rect = display_element.getBoundingClientRect();
         let xg = (rect1.left + rect1.right + rect2.left + rect2.right) / 4;
         let yg = (rect1.top + rect1.bottom + rect2.top + rect2.bottom) / 4;
         let dx = (rect2.left + rect2.right - rect1.left - rect1.right);
@@ -123,12 +120,11 @@ function make_graph(graphs, container = "body", edit_mode = false) {
         }
         let length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
         let xgr = xg - (length / 2);
-        let ygr = yg - (thickness / 2);
         let angle = Math.atan2(y2 - y1, x2 - x1);
 
         el_link.style["width"] = `${length}px`;
-        el_link.style["left"] = `${xgr + window.scrollX}px`;
-        el_link.style["top"] = `${ygr + window.scrollY}px`;
+        el_link.style["left"] = `${xgr - display_rect.left}px`;
+        el_link.style["top"] = `${yg - display_rect.top}px`;
         el_link.style["-moz-transform"] = `rotate(${angle}rad)`;
         el_link.style["-webkit-transform"] = `rotate(${angle}rad)`;
         el_link.style["-o-transform"] = `rotate(${angle}rad)`;
@@ -138,8 +134,8 @@ function make_graph(graphs, container = "body", edit_mode = false) {
         for (k in label_object) {
             let el_label = label_object[k];
             let rectlabel = el_label.getBoundingClientRect();
-            el_label.style["left"] = `${(1 - k) * x1 + k * x2 + window.scrollX - rectlabel["width"] / 2}px`;
-            el_label.style["top"] = `${(1 - k) * y1 + k * y2 + window.scrollY - rectlabel["height"] / 2}px`;
+            el_label.style["left"] = `${(1 - k) * x1 + k * x2 - display_rect.left - rectlabel["width"] / 2}px`;
+            el_label.style["top"] = `${(1 - k) * y1 + k * y2 - display_rect.top - rectlabel["height"] / 2}px`;
         }
     }
 
@@ -147,9 +143,9 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     function create_node(text) {
         let node = document.createElement("div");
         node.appendChild(document.createTextNode(text));
-        node.style.cssText = `user-select:none; position:absolute; margin:0; padding:0.3em; z-index:1; border:1px solid ${COLOR}; border-radius:0.3em; background-color: ${BCOLOR}`
+        node.style.cssText = `user-select:none; position:absolute; width:fit-content; height:fit-content; margin:0; padding:0.3em; z-index:1; border:1px solid ${COLOR}; border-radius:0.3em; background-color: ${BCOLOR}`
         dragElement(node);
-        nodes.appendChild(node);
+        display_element.appendChild(node);
         return node;
     }
 
@@ -159,7 +155,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
             for (const node of graph["nodes"]) {
                 let element_node = null;
                 if (!id_nodes.hasOwnProperty(node["id"])) {
-                    element_node = create_node(node["id"], nodes);
+                    element_node = create_node(node["id"], display_element);
                     map_nodes.set(element_node, { "id": node["id"], "graphs": [graph], "successors": new Map(), "predecessors": new Map(), "loop": false, "x": [], "y": [], "color": [], "color_graph": [] });
                     id_nodes[node["id"]] = element_node;
                 }
@@ -177,7 +173,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
         }
         let w = 2; // box shadow colors px
         map_nodes.forEach((params, element_node) => {
-            let [left, top] = random_position(element_node, nodes, params["x"].slice(-1)[0], params["y"].slice(-1)[0]);
+            let [left, top] = random_position(element_node, display_element, params["x"].slice(-1)[0], params["y"].slice(-1)[0]);
             element_node.style["left"] = `${left}px`;
             element_node.style["top"] = `${top}px`;
             let box_shadow = [];
@@ -188,25 +184,25 @@ function make_graph(graphs, container = "body", edit_mode = false) {
         });
     };
 
-    function create_link(directed = true, marker = "►") {
+    function create_link(directed = true, marker = "⯈") {
         let link_element = document.createElement("div");
-        link_element.style.cssText = `user-select:none; display:flex; margin:0; padding:0; z-index:-1; position:absolute; height:0; justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${BCOLOR}; border: solid 1px ${COLOR}; font-size:1.5em;`
+        link_element.style.cssText = `position:absolute; user-select:none; display:flex; margin:0; padding:0; z-index:-1; height:0;justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${COLOR}; border: solid 1px ${COLOR}; font-size:1.8em;`
         if (directed) { link_element.appendChild(document.createTextNode(marker)); }
-        links.appendChild(link_element);
+        display_element.appendChild(link_element);
         return link_element;
     }
 
     function create_loop() {
         let loop_element = document.createElement("div");
         loop_element.style.cssText = `user-select:none; display:flex; margin:0; padding:0; z-index:-1; position:absolute; align-items:center; background-color:transparent; border-top: solid 1px ${COLOR};  border-right: solid 1px ${COLOR}; border-radius: 1em;`
-        links.appendChild(loop_element);
+        display_element.appendChild(loop_element);
         return loop_element;
     }
 
     function create_label() {
         let label = document.createElement("div");
         label.style.cssText = `position:absolute; user-select:none; color:${COLOR}; font-size:smaller; margin:0; padding:0; border-radius:0.4em; background-color:${BCOLOR};`;
-        labels.appendChild(label);
+        display_element.appendChild(label);
         return label;
     }
 
@@ -306,7 +302,8 @@ function make_graph(graphs, container = "body", edit_mode = false) {
             }
 
             document.onpointermove = function(e) {
-                let bounds = nodes.getBoundingClientRect();
+                console.log(elmnt.offsetLeft - elmnt.offsetRight)
+                let bounds = display_element.getBoundingClientRect();
                 if ((e.pageX - xd < bounds["right"]) && (e.pageX - dx > bounds["left"])) {
                     let left = e.pageX - bounds["left"] - dx;
                     elmnt.style.left = `${left}px`;
