@@ -15,7 +15,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     const display_element = document.createElement("div");
     display_element.style["padding"] = 0;
     display_element.style["margin"] = 0;
-    display_element.style["position"] = "absolute";
+    display_element.style["position"] = "relative";
     display_element.style["left"] = "0px";
     display_element.style["top"] = "0px";
     display_element.style["width"] = `${nodes_width}px`;
@@ -25,9 +25,9 @@ function make_graph(graphs, container = "body", edit_mode = false) {
     if (edit_mode) {
         const button_download = document.createElement("button");
         button_download.textContent = "Download";
-        button_download.style["position"] = "absolute";
-        button_download.style["top"] = `${nodes_height + 1}px`;
-        button_download.style["left"] = "10px";
+        button_download.style["position"] = "relative";
+        button_download.style["top"] = "1em";
+        button_download.style["left"] = "1em";
         button_download.onpointerdown = dl_graphs;
         main.appendChild(button_download);
     }
@@ -186,7 +186,7 @@ function make_graph(graphs, container = "body", edit_mode = false) {
 
     function create_link(directed = true, marker = "⯈") {
         let link_element = document.createElement("div");
-        link_element.style.cssText = `position:absolute; user-select:none; display:flex; margin:0; padding:0; z-index:-1; height:0;justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${COLOR}; border: solid 1px ${COLOR}; font-size:1.8em;`
+        link_element.style.cssText = `position:absolute; user-select:none; display:flex; margin:0; padding:0; z-index:-1; height:0;justify-content:right; align-items:center; vertical-align: baseline; color:${COLOR}; background-color:${COLOR}; border: solid 0.5px ${COLOR}; font-size:1.8em;`
         if (directed) { link_element.appendChild(document.createTextNode(marker)); }
         display_element.appendChild(link_element);
         return link_element;
